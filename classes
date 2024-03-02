@@ -1,0 +1,85 @@
+// classes.h
+
+#ifndef CLASSES_H
+#define CLASSES_H
+
+#include <iostream>
+#include <bitset>
+#include <string>
+#include <limits>
+#include <cctype>
+#include <windows.h>
+
+void displayProgress(int progress);
+
+class Menu {
+public:
+    virtual int showMenu();
+};
+
+class Encryptor : public Menu {
+public:
+    virtual int showMenu();
+};
+
+class XOR_Enc : public Encryptor {
+private:
+    std::string key;
+
+public:
+    XOR_Enc(const std::string &userKey);
+
+    std::string charToBin(char ch) const;
+    std::string binToFormattedString(const std::string &binary) const;
+    std::string doXOR(const std::string &data) const;
+    std::string encrypt(const std::string &data) const;
+};
+
+class Caesar_Enc : public Encryptor {
+public:
+    static std::string encrypt(const std::string &message, int key);
+};
+
+class Vigenere_Enc : public Encryptor {
+private:
+    size_t keyLength;
+    std::string key;
+
+public:
+    Vigenere_Enc(const std::string &key);
+
+    std::string encrypt(const std::string &plaintext);
+};
+
+class Decryptor : public Menu {
+public:
+    virtual int showMenu();
+};
+
+class XORDecryptor : public Decryptor {
+private:
+    std::string key;
+
+public:
+    XORDecryptor(const std::string &userKey);
+
+    std::string doXOR(const std::string &data) const;
+    std::string decrypt(const std::string &data) const;
+};
+
+class Caesar_Dec : public Decryptor {
+public:
+    std::string decrypt(const std::string &encpMsg, int key);
+};
+
+class Vigenere_Dec : public Decryptor {
+private:
+    std::string key;
+
+public:
+    Vigenere_Dec(const std::string &key);
+
+    std::string decrypt(const std::string &ciphertext);
+};
+
+#endif // CLASSES_H
