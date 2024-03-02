@@ -1,0 +1,322 @@
+#include "classes.h"
+
+static const int ALPHABET_SIZE = 26;
+using namespace std;
+
+void displayProgress(int progress) {
+    cout << "In progress: " << progress << "% ";
+    for (int i = 0; i < progress / 10; ++i) {
+        cout << "=";
+    }
+    cout << ">";
+    for (int i = progress / 10; i < 10; ++i) {
+        cout << " ";
+    }
+    cout << "\r";
+    cout.flush();
+    
+    if (progress==100)
+    {
+    	Sleep(1000);
+    	system("cls");
+	}
+}
+
+int Menu::showMenu() {
+	cout<<endl;
+	cout<<"=== MAIN MENU ===";
+	cout<<endl;
+	cout<<"1. Encrypt text. "<<endl;
+	cout<<"2. Decrypt text. "<<endl;
+	cout<<"3. Exit. "<<endl;
+	cout<<endl;
+	cout<<"Choose an operation between 1. and 3. => ";
+	cout<<" ";
+	
+	int choice;
+	cin>>choice;
+	return choice;
+}
+
+int Encryptor::showMenu() {
+	cout<<"=== OPTIONS ===";
+	cout<<endl;
+	cout<<"1. Use XOR cipher. "<<endl;
+	cout<<"2. Use Caesar cipher. "<<endl;
+	cout<<"3. Use Vigenere cipher. "<<endl;
+	cout<<"4. Go back to main menu. "<<endl;
+	cout<<endl;
+	cout<<"Choose an operation between 1. and 4. => ";
+	
+	int encChoice;
+	cin>>encChoice;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	return encChoice;
+}
+
+XOR_Enc::XOR_Enc(const std::string &userKey) : key(userKey) {}
+
+std::string XOR_Enc::charToBin(char ch) const {
+   	return bitset<8>(ch).to_string();
+}
+
+std::string XOR_Enc::binToFormattedString(const std::string &binary) const {
+    string formattedString = "";
+    for (int i = 0; i < binary.length(); i += 8) {
+        string byte = binary.substr(i, 8);
+        formattedString += byte + " ";
+    }
+    return formattedString;
+}
+
+std::string XOR_Enc::doXOR(const std::string &data) const {
+    string result = data;
+    for (int i = 0; i < data.length(); ++i) {
+        result[i] = ((data[i] - '0') ^ (key[i % key.length()] - '0')) + '0';
+    }
+    return result;
+}
+
+std::string XOR_Enc::encrypt(const std::string &data) const {
+    string binaryData = "";
+    for (int i = 0; i < data.length(); ++i) {
+        binaryData += charToBin(data[i]);
+    }
+
+    string repeatedKey = "";
+    for (int i = 0; i < binaryData.length(); ++i) {
+        repeatedKey += key[i % key.length()];
+    }
+
+    string encryptedData = doXOR(binaryData);
+    
+    
+    for (int i=0;i<=100; i+=100)
+	{
+		displayProgress(i);
+		Sleep(1000);
+	}
+
+    cout << "Encrypted text: " << binToFormattedString(encryptedData) << endl;
+    return encryptedData;
+}
+
+std::string Caesar_Enc::encrypt(const std::string &message, int key) {
+	string encryptedText=message;
+		
+		for (int i=0;i<message.size(); i++)
+		{
+			if (message[i]==32)
+			{
+				continue;
+			}
+			
+			else
+			{
+				if ((message[i]+key)>122)
+				{
+					int temp=(message[i]+key)-122;
+					encryptedText[i]=96+temp;
+				}
+				
+				else if (message[i]+key>90&&message[i]<=96)
+				{
+					int temp=(message[i]+key)-90;
+					encryptedText[i]=64+temp;
+				}
+				
+				else
+				{
+					encryptedText[i] += key;
+				}
+			}
+		}
+		
+		 
+	    for (int i=0;i<=100; i+=100)
+		{
+			displayProgress(i);
+			Sleep(1000);
+		}
+		
+		return encryptedText;
+}
+
+Vigenere_Enc::Vigenere_Enc(const std::string &key) : key(key), keyLength(key.length()) {
+    for (size_t i=0;i<key.size(); ++i)
+			{
+				if (isdigit(key[i]))
+				{
+					cout<<"Invalid key with numbers. Program terminated. "<<endl;
+					exit(1);
+				}
+			}
+}
+
+std::string Vigenere_Enc::encrypt(const std::string &plaintext) {
+    string ciphertext="";
+			
+	for (size_t i=0,j=0; i<plaintext.length(); i++)
+	{
+		char currentChar=plaintext[i];
+		
+		if (isalpha(currentChar))
+		{
+			char shift=isupper(currentChar)?'A':'a';
+			ciphertext += ((currentChar + key[j]-2*shift)%26+26)%26+shift;
+			j=(j+1)%keyLength;
+		}
+		
+		else if (isspace(currentChar))
+		{
+			ciphertext+=' ';//preserve space in plaintext
+		}
+		
+		else 
+		{
+			cout<<"Invalid character in plaintext. Program terminated. "<<endl;
+			exit(1);
+		}
+	}
+	
+	
+    for (int i=0;i<=100; i+=100)
+	{
+		displayProgress(i);
+		Sleep(1000);
+	}
+	
+	return ciphertext;
+}
+
+int Decryptor::showMenu() {
+	cout<<endl;
+	cout<<"=== OPTIONS ===";
+	cout<<endl;
+	cout<<"1. Use XOR Decryptor. "<<endl;
+	cout<<"2. Use Caesar Decryptor. "<<endl;
+	cout<<"3. Use Vigenere Decryptor. "<<endl;
+	cout<<"4. Go back to main menu. "<<endl;
+	cout<<endl;
+	cout<<"Choose an operation between 1. and 4. => ";
+	cout<<" ";
+	
+	int encChoice;
+	cin>>encChoice;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	return encChoice;
+}
+
+XORDecryptor::XORDecryptor(const std::string &userKey) : key(userKey) {}
+
+std::string XORDecryptor::doXOR(const std::string &data) const {
+    string result = data;
+    for (int i = 0; i < data.length(); ++i)
+    {
+        result[i] = ((data[i] - '0') ^ (key[i % key.length()] - '0')) + '0';
+    }
+    return result;
+}
+
+std::string XORDecryptor::decrypt(const std::string &data) const {
+    string binaryData = "";
+    for (int i = 0; i < data.length(); ++i)
+    {
+        char ch = data[i];
+        if (ch != ' ')
+        {
+            binaryData += ch;
+        }
+    }
+
+    string repeatedKey = "";
+    for (int i = 0; i < data.length(); ++i)
+    {
+        repeatedKey += key[i % key.length()];
+    }
+
+    
+    binaryData = doXOR(binaryData);
+
+    string decryptedText = "";
+    for (int i = 0; i < binaryData.length(); i += 8)
+    {
+        string byte = binaryData.substr(i, 8);
+        char character = static_cast<char>(bitset<8>(byte).to_ulong());
+        decryptedText += character;
+    }
+	
+	
+	for (int i=0;i<=100; i+=100)
+	{
+		displayProgress(i);
+		Sleep(1000);
+	}
+		
+    cout << "Decrypted Data: " << decryptedText;
+    return decryptedText;
+}
+
+std::string Caesar_Dec::decrypt(const std::string &encpMsg, int key) {
+    string decryptedText = encpMsg;
+
+    for (int i = 0; i < encpMsg.size(); i++)
+    {
+        if (encpMsg[i] == 32)
+        {
+            continue;
+        }
+        else
+        {
+            if ((encpMsg[i] - key) < 97 && (encpMsg[i] - key) > 90)
+            {
+                int temp = (encpMsg[i] - key) + ALPHABET_SIZE;
+                decryptedText[i] = temp;
+            }
+            else if ((encpMsg[i] - key) < 65)
+            {
+                int temp = (encpMsg[i] - key) + ALPHABET_SIZE;
+                decryptedText[i] = temp;
+            }
+            else
+            {
+                decryptedText[i] = encpMsg[i] - key;
+            }
+        }
+    }
+	
+    return decryptedText;
+}
+
+Vigenere_Dec::Vigenere_Dec(const std::string &key) : key(key) {}
+
+std::string Vigenere_Dec::decrypt(const std::string &ciphertext) {
+    string decrypted_text;
+    int key_index = 0;
+
+    for (size_t i = 0; i < ciphertext.length(); ++i) {
+        char cipher_char = ciphertext[i];
+        if (isalpha(cipher_char)) {
+            char decrypted_char;
+            int shift = toupper(key[key_index]) - 'A';
+
+            if (islower(cipher_char))
+                decrypted_char = ((cipher_char - 'a' - shift + 26) % 26) + 'a';
+            else
+                decrypted_char = ((cipher_char - 'A' - shift + 26) % 26) + 'A';
+
+            decrypted_text += decrypted_char;
+            key_index = (key_index + 1) % key.length();
+        } else {
+            decrypted_text += cipher_char;
+        }
+    }
+
+	
+	for (int i=0;i<=100; i+=100)
+	{
+		displayProgress(i);
+		Sleep(1000);
+	}
+    return decrypted_text;
+}
