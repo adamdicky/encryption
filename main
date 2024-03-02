@@ -1,1 +1,230 @@
 
+#include "classes.h"
+using namespace std;
+
+
+int main() {
+    Menu m;
+	Encryptor e;
+	Decryptor d;
+	int selection=m.showMenu();
+	
+	int encSelection;
+	int decryptSelection;
+	while (selection !=3) // selection menu
+	{
+		switch(selection) 
+		{
+			case 1: //SHOW ENCRYPT MENU
+			{
+				cout<<endl;
+			 encSelection = e.showMenu();
+			
+			 
+			
+			while (encSelection !=4) 
+			{
+				switch(encSelection)
+				{
+					case 1:
+					{	
+						string userKey;
+						
+						cout<<" "<<endl;
+						cout<<"=== XOR ENCRYPTION ==="<<endl;
+						cout<<" "<<endl;
+						
+						cout<<"Enter the key for XOR encryption (Only 4 bits): ";
+						getline(cin, userKey);
+						XOR_Enc XORobject(userKey);
+						
+						cout<<"Enter the data to encrypt: ";
+						string inputData;
+						getline(cin, inputData);
+						
+						string binaryEncryptedData=XORobject.encrypt(inputData);
+						cout<<endl;
+						break;
+					}
+					
+					case 2:
+					{
+						cout<<" "<<endl;
+						cout<<"=== CAESAR ENCRYPTION ==="<<endl;
+						cout<<" "<<endl;
+						
+						string message;
+						cout<<"Message can only be alphabetic. "<<endl;
+						cout<<"Enter message: ";
+						getline(cin, message);
+						
+						int key;
+						cout<<"Enter key (0-25): ";
+						cin>>key;
+						cin.ignore();
+						string encryptedText=Caesar_Enc::encrypt(message, key);
+						
+						cout<<"Encrypted text: "<<encryptedText<<endl;
+						cout<<endl;
+						break;
+					}
+					
+					case 3:
+					{
+						cout<<" "<<endl;
+						cout<<"=== VIGENERE ENCRYPTION ==="<<endl;
+						cout<<" "<<endl;
+						
+						string input, key;
+						cout<<"Enter the plaintext: ";
+						getline(cin, input);
+						
+						cout<<"Enter the key: ";
+						getline(cin, key);
+						
+						Vigenere_Enc cipher(key);
+						
+						string encryptedText=cipher.encrypt(input);
+						cout<<"Encrypted text: "<<encryptedText<<endl;
+						break;
+					}
+					
+					// end case
+					cout<<endl;
+					break;
+				}
+				
+				encSelection=e.showMenu();
+			}
+			break;
+		}
+			//case 2: //SHOW DECRYPT MENU
+			case 2:
+   			{
+        		cout << endl;
+        		decryptSelection = d.showMenu();
+
+       			while (decryptSelection != 4)
+        			{
+			            switch (decryptSelection)
+			            {
+			                // XOR decrypt
+			                case 1:
+			                {
+			                	string encryptedData;
+			                	cout << " " << endl;
+			                	cout << "=== XOR DECRYPTION ===" << endl;
+			                	cout<<endl;
+			                	cout<<"Enter encrypted text : ";
+			                	getline(cin, encryptedData);
+			                	
+			                
+			                
+			
+							    cout << "Enter the key for decryption (Only 4 bits): ";
+							    string decryptKey;
+							    getline(cin, decryptKey);
+							
+							    // Declare the variable here
+							    string decryptedData;
+							
+							    XORDecryptor decryptor(decryptKey);
+							    decryptedData = decryptor.decrypt(encryptedData);
+							    cout<<endl;
+			
+			                    break;
+			                }
+			
+			                case 2:
+			                {
+			                    string encpMsg;
+			                    cout << " " << endl;
+			                    cout << "=== CAESAR DECRYPTION ===" << endl;
+			                    cout<<endl;
+			                    cout << "Message can only be alphabetic" << endl;
+			                    cout << "Enter encrypted text: ";
+			                    getline(cin, encpMsg);
+			
+			                    int dcyptKey;
+			                    cout << "Enter key (0-25): ";
+			                    cin >> dcyptKey;
+			                    cin.ignore();
+			
+			                    string decryptedText = encpMsg;
+			
+			                    for (int i = 0; i < encpMsg.size(); i++)
+			                    {
+			                        if (encpMsg[i] == 32)
+			                        {
+			                            continue; // ignoring space
+			                        }
+			                        else
+			                        {
+			                            if ((encpMsg[i] - dcyptKey) < 97 && (encpMsg[i] - dcyptKey) > 90)
+			                            {
+			                                int temp = (encpMsg[i] - dcyptKey) + 26; // Change here, subtract 26 instead of adding
+			                                decryptedText[i] = temp;
+			                            }
+			                            else if ((encpMsg[i] - dcyptKey) < 65)
+			                            {
+			                                int temp = (encpMsg[i] - dcyptKey) + 26; // Change here, subtract 26 instead of adding
+			                                decryptedText[i] = temp;
+			                            }
+			                            else
+			                            {
+			                                decryptedText[i] = encpMsg[i] - dcyptKey;
+			                            }
+			                        }
+			                    }
+								
+								//progressTrackGimmick
+								for (int i=0;i<=100; i+=100)
+								{
+									displayProgress(i);
+									Sleep(1000);
+								}
+			                    cout << "Decrypted Message: " << decryptedText;
+			                    cout<<endl;
+			                    break;
+			                }
+			               case 3:
+						   {
+						   		cout << " " << endl;
+			                    cout << "=== VIGENERE DECRYPTION ===" << endl;
+			                    cout << endl;
+			
+			                    string ciphertext, key;
+			
+			                    cout << "Enter the encrypted text: ";
+			                    getline(cin, ciphertext);
+			
+			                    cout << "Enter the encryption key: ";
+			                    getline(cin, key);
+			
+			                    Vigenere_Dec cipher(key);
+			                    string decrypted_text = cipher.decrypt(ciphertext);
+			
+			                    cout << "Decrypted Text: " << decrypted_text;
+			                    cout<< endl;
+			
+			                    break;
+							}
+			                
+			            }
+						
+						decryptSelection = d.showMenu();	 
+					}
+		 			
+					 break;
+			
+			///end case
+		cout<<endl;
+		break;
+		
+		}
+		}			
+		
+		selection=m.showMenu();
+	}
+    return 0;
+}
